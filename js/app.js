@@ -53,36 +53,75 @@ function SearchController($scope, $location, $http, $timeout) {
   $scope.searching = false;
 
   $scope.isSearch = function() {
-    return $scope.query.length > 0 && $scope.query.charAt(0) != '!';
+    return currentMode == languageSelect;
   }
 
-  function onUpdate() {
-    search.focus();
-    var q = $scope.query;
-    var path = 'search/'+$scope.docsets.join('+')+'/';
-    $timeout.cancel(pending);
-    sidebar.scrollTop = 0;
-
-    if(q.length == 0) {
+  var emptySelect = {
+    onUpdate: function(q) {
+      var path = 'search/'+$scope.docsets.join('+')+'/';
       $location.path(path);
       ++requestCounter;
       $scope.results = [];
       $scope.searching = false;
-    }
-    else if(q.charAt(0) == '!') {
+    },
+    onItemClick: function() {},
+    onDetach: function() {}
+  }
+
+  var languageSelect = {
+    onUpdate: function(q) {
       var term = q.substring(1);
       $scope.results = $scope.availableDocsets
         .filter(function(e) { return e.toUpperCase().indexOf(term.toUpperCase()) == 0})
         .map(function(e) { return {type: 'Language', name: e, uname: e.replace('_', ' ')}})
-      $scope.selected = -1;
-    }
-    else if($scope.isSearch()) {
+    },
+    onItemClick: function(index) {
+      $scope.docsets = [$scope.results[index].name];
+      $scope.query = "";
+    },
+    onDetach: function() {}
+  };
+
+  var articleSelect = {
+    onUpdate: function(q) {
+      var path = 'search/'+$scope.docsets.join('+')+'/';
       $location.path(path+q);
       pending = $timeout(function() {
         $scope.doSearch(q);
       }, searchDelay);
-      $scope.selected = -1;
+    },
+    onItemClick: function(index) {
+      frame.src = $scope.results[index].path;
+    },
+    onDetach: function() {
+      $timeout.cancel(pending);
     }
+  };
+
+  var currentMode = emptySelect;
+
+  function switchMode(mode) {
+    if(mode != currentMode) {
+      currentMode.onDetach();
+      currentMode = mode;
+    }
+  }
+
+  function onUpdate() {
+    search.focus();
+    sidebar.scrollTop = 0;
+    var q = $scope.query;
+    if(q.length == 0) {
+      switchMode(emptySelect);
+    }
+    else if(q.charAt(0) == '!') {
+      switchMode(languageSelect);
+    }
+    else {
+      switchMode(articleSelect);
+    }
+    currentMode.onUpdate(q);
+    $scope.selected = -1;
   }
 
   $scope.$watch('query', onUpdate);
@@ -116,13 +155,7 @@ function SearchController($scope, $location, $http, $timeout) {
   $scope.onItemClick = function(index) {
     if(index < 0) index = 0;
     if(index >= $scope.results.length) return;
-    if($scope.isSearch()) {
-      frame.src = $scope.results[index].path;
-    }
-    else {
-      $scope.docsets = [$scope.results[index].name];
-      $scope.query = "";
-    }
+    currentMode.onItemClick(index);
     $scope.selected = -1;
   };
 
