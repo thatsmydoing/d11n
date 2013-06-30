@@ -18,6 +18,41 @@ app.factory('typeFormatter', function() {
     return t.substring(0, 1).toUpperCase();
   };
 });
+app.factory('docsetResolver', function() {
+  var parents = {
+    'CakePHP': ['PHP'],
+    'Yii': ['PHP'],
+    'CodeIgniter': ['PHP'],
+    'Zend Framework': ['PHP'],
+    'Play_Scala': ['Scala'],
+    'Play_Java': ['Java'],
+    'Ruby on Rails': ['Ruby'],
+    'Django': ['Python 2'],
+    'Compass': ['Sass']
+  };
+
+  var groups = {
+    'Web': ['HTML', 'CSS', 'JavaScript']
+  };
+
+  function resolve(docset, withParent) {
+    if(groups[docset] != undefined) {
+      return groups[docset];
+    }
+    else if(withParent && parents[docset] != undefined) {
+      return [docset].concat(parents[docset]);
+    }
+    else {
+      return [docset];
+    }
+  }
+
+  return {
+    resolve: resolve,
+    parents: parents,
+    groups: groups
+  };
+})
 app.directive('type', function(typeFormatter) {
   return {
     restrict: 'E',
@@ -32,16 +67,22 @@ app.directive('type', function(typeFormatter) {
   }
 });
 
-function SearchController($scope, $location, $http, $timeout) {
+function SearchController($scope, $location, $http, $timeout, docsetResolver) {
   $scope.results = [];
   $scope.availableDocsets = [];
-  $scope.docsets = ['HTML'];
+  $scope.currentDocset = 'Web';
   $scope.query = "";
+  $scope.withParent = false;
 
   function loadFromLocation() {
     var paths = $location.path().substring(8).split('/');
     if(paths.length == 2) {
-      $scope.docsets = paths[0].split('+');
+      $scope.withParent = false;
+      if(paths[0].charAt(0) == '~') {
+        $scope.withParent = true;
+        paths[0] = paths[0].substring(1);
+      }
+      $scope.currentDocset = paths[0];
       $scope.query = paths[1];
     }
   }
@@ -56,10 +97,14 @@ function SearchController($scope, $location, $http, $timeout) {
     return !$scope.searching && currentMode == articleSelect && $scope.results.length == 0;
   }
 
+  function path() {
+    var hasTilde = docsetResolver.parents[$scope.currentDocset] != undefined && $scope.withParent;
+    return 'search/'+(hasTilde ? '~' : '')+$scope.currentDocset+'/';
+  }
+
   var emptySelect = {
     onUpdate: function(q) {
-      var path = 'search/'+$scope.docsets.join(',')+'/';
-      $location.path(path);
+      $location.path(path());
       ++requestCounter;
       $scope.results = [];
       $scope.searching = false;
@@ -76,7 +121,7 @@ function SearchController($scope, $location, $http, $timeout) {
         .map(function(e) { return {type: 'Language', name: e, uname: e.replace('_', ' ')}})
     },
     onItemClick: function(index) {
-      $scope.docsets = [$scope.results[index].name];
+      $scope.currentDocset = $scope.results[index].name;
       $scope.query = "";
     },
     onDetach: function() {}
@@ -84,8 +129,7 @@ function SearchController($scope, $location, $http, $timeout) {
 
   var articleSelect = {
     onUpdate: function(q) {
-      var path = 'search/'+$scope.docsets.join(',')+'/';
-      $location.path(path+q);
+      $location.path(path()+q);
       $timeout.cancel(pending);
       pending = $timeout(function() {
         $scope.doSearch(q);
@@ -126,7 +170,8 @@ function SearchController($scope, $location, $http, $timeout) {
   }
 
   $scope.$watch('query', onUpdate);
-  $scope.$watch('docsets', onUpdate);
+  $scope.$watch('currentDocset', onUpdate);
+  $scope.$watch('withParent', onUpdate);
 
   function unescape(input){
     var e = document.createElement('div');
@@ -137,7 +182,7 @@ function SearchController($scope, $location, $http, $timeout) {
   $scope.doSearch = function(query) {
     $scope.searching = true;
     var requestNum = ++requestCounter;
-    var qs = $scope.docsets.map(function(elem) {return '&docset='+elem}).join()+'&q='+query;
+    var qs = docsetResolver.resolve($scope.currentDocset, $scope.withParent).map(function(elem) {return '&docset='+elem}).join('')+'&q='+query;
     $http.jsonp(apiServer+'/search?callback=JSON_CALLBACK'+qs).success(function(data) {
       if(requestCounter == requestNum) {
         $scope.results = data.results;
@@ -206,6 +251,23 @@ function SearchController($scope, $location, $http, $timeout) {
   }
 
   $http.jsonp(apiServer+'/docs?callback=JSON_CALLBACK').success(function(data) {
+    angular.forEach(docsetResolver.groups, function(value, key) {
+      data.push(key);
+    })
     $scope.availableDocsets = data.sort(caseInsensitiveCmp);
   });
+
+  $scope.parts = function() {
+    if(docsetResolver.groups[$scope.currentDocset] != undefined) {
+      return '('+docsetResolver.groups[$scope.currentDocset].join(', ')+')'
+    }
+    return "";
+  }
+
+  $scope.parents = function() {
+    if(docsetResolver.parents[$scope.currentDocset] != undefined) {
+      return docsetResolver.parents[$scope.currentDocset].join(',');
+    }
+    return "";
+  }
 }

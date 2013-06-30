@@ -58,12 +58,18 @@ iframe {
 }
 
 #currentDocset a {
-    border-bottom: 1px dashed;
+    white-space: nowrap;
+    overflow-x: hidden;
     cursor: pointer;
+    border-bottom: 1px dashed;
 }
 
 #currentDocset a:hover {
     border-bottom: 1px solid;
+}
+
+#currentDocset span {
+    font-size: 75%;
 }
 
 .type {
@@ -77,8 +83,12 @@ iframe {
 
 #indicator {
     position: absolute;
-    top: 10px;
+    top: 5px;
     right: 10px;
+}
+
+#parents {
+    font-size: smaller;
 }
 
 .searching {

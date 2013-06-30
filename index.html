@@ -6,9 +6,12 @@
 </head>
 <body>
   <div id="sidebar" ng-controller="SearchController" ng-mouseout="resetSelection()">
-    <h3 id="currentDocset"><a ng-click="query = '!'">{{docsets[0]}}</a></h3>
+    <h3 id="currentDocset">
+      <a ng-click="query = '!'">{{currentDocset}} <span>{{parts()}}</span></a>
+    </h3>
     <div id="indicator">d<span ng-class="{searching: searching}">11</span>n</div>
     <input type="text" id="search" class="search" ng-model="query" placeholder="Search..." autofocus="autofocus" autocomplete="off">
+    <span id="parents" ng-show="parents() != ''"><input type="checkbox" ng-model="withParent"> include {{ parents() }}?</span>
     <ul id="results" class="search-results">
       <li ng-repeat="result in results" class="{{result.type.toLowerCase()}}" ng-class="{selected: $index == selected}" ng-mouseover="onItemHover($index)" ng-mouseup="onItemClick($index)">
         <a href="{{result.path}}" target="frame" title="{{result.uname}}">
