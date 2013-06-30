@@ -107,7 +107,6 @@ function SearchController($scope, $location, $http, $timeout, docsetResolver) {
       $location.path(path());
       ++requestCounter;
       $scope.results = [];
-      $scope.searching = false;
     },
     onItemClick: function() {},
     onDetach: function() {}
@@ -129,6 +128,7 @@ function SearchController($scope, $location, $http, $timeout, docsetResolver) {
 
   var articleSelect = {
     onUpdate: function(q) {
+      $scope.searching = true;
       $location.path(path()+q);
       $timeout.cancel(pending);
       pending = $timeout(function() {
@@ -139,6 +139,7 @@ function SearchController($scope, $location, $http, $timeout, docsetResolver) {
       frame.src = $scope.results[index].path;
     },
     onDetach: function() {
+      $scope.searching = false;
       $timeout.cancel(pending);
     }
   };
@@ -180,7 +181,6 @@ function SearchController($scope, $location, $http, $timeout, docsetResolver) {
   }
 
   $scope.doSearch = function(query) {
-    $scope.searching = true;
     var requestNum = ++requestCounter;
     var qs = docsetResolver.resolve($scope.currentDocset, $scope.withParent).map(function(elem) {return '&docset='+elem}).join('')+'&q='+query;
     $http.jsonp(apiServer+'/search?callback=JSON_CALLBACK'+qs).success(function(data) {
