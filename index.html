@@ -7,12 +7,12 @@
 <body>
   <div id="sidebar" ng-controller="SearchController" ng-mouseout="resetSelection()">
     <h3 id="currentDocset">
-      <a ng-click="query = '!'">{{currentDocset}} <span>{{parts()}}</span></a>
+      <a ng-click="query = '!'" ng-bind="currentDocset">Loading... <span ng-bind="parts()"></span></a>
     </h3>
     <div id="indicator">d<span ng-class="{searching: searching}">11</span>n</div>
     <input type="text" id="search" class="search" ng-model="query" placeholder="Search..." autofocus="autofocus" autocomplete="off">
-    <span id="parents" ng-show="parents() != ''"><input type="checkbox" ng-model="withParent"> include {{ parents() }}?</span>
-    <ul id="results" class="search-results">
+    <span class="ng-cloak" id="parents" ng-show="parents() != ''"><input type="checkbox" ng-model="withParent"> include {{ parents() }}?</span>
+    <ul id="results" class="search-results ng-cloak">
       <li ng-repeat="result in results" class="{{result.type.toLowerCase()}}" ng-class="{selected: $index == selected}" ng-mouseover="onItemHover($index)" ng-mouseup="onItemClick($index)">
         <a href="{{result.path}}" target="frame" title="{{result.uname}}">
           <type title="{{result.type}}"></type>
@@ -20,7 +20,7 @@
         </a>
       </li>
     </ul>
-    <p ng-show="noResults()">No results.</p>
+    <p class="ng-cloak" ng-show="noResults()">No results.</p>
   </div>
   <div id="content">
     <iframe id="frame" name="frame" seamless src="splash.html"></iframe>

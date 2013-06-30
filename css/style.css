@@ -9,6 +9,10 @@ html, body, div {
     margin: 0;
 }
 
+.ng-cloak {
+    display: none;
+}
+
 #sidebar {
     position: relative;
     float: left;
