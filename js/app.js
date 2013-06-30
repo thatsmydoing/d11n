@@ -229,8 +229,8 @@ function SearchController($scope, $location, $http, $timeout, docsetResolver) {
     }
     else if(event.keyCode == 38) {
       $scope.selected -= 1;
-      updateScroll();
       if($scope.selected < 0) $scope.selected = $scope.results.length - 1;
+      updateScroll();
       event.preventDefault();
     }
     else if(event.keyCode == 13) {
