@@ -27,7 +27,7 @@ html, body, div {
 
 #content {
     float: left;
-    width: calc(100% - 280px);
+    width: calc(100% - 260px);
 }
 
 iframe {
