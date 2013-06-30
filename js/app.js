@@ -1,5 +1,5 @@
 var apiServer = 'http://api.doks.io';
-var searchDelay = 100;
+var searchDelay = 700;
 
 var search = document.getElementById('search');
 var frame = document.getElementById('frame');
