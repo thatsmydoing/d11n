@@ -7,7 +7,8 @@
 <body>
   <div id="sidebar" ng-controller="SearchController" ng-mouseout="resetSelection()">
     <h3 id="currentDocset">
-      <a ng-click="query = '!'" ng-bind="currentDocset">Loading... <span ng-bind="parts()"></span></a>
+      <a ng-bind="">Loading...</a>
+      <a class="ng-cloak" ng-click="query = '!'">{{currentDocset}} <span>{{ parts() }}</span></a>
     </h3>
     <div id="indicator">d<span ng-class="{searching: searching}">11</span>n</div>
     <input type="text" id="search" class="search" ng-model="query" placeholder="Search..." autofocus="autofocus" autocomplete="off">
