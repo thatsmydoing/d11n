@@ -86,6 +86,7 @@ function SearchController($scope, $location, $http, $timeout) {
     onUpdate: function(q) {
       var path = 'search/'+$scope.docsets.join(',')+'/';
       $location.path(path+q);
+      $timeout.cancel(pending);
       pending = $timeout(function() {
         $scope.doSearch(q);
       }, searchDelay);
