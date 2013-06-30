@@ -58,7 +58,7 @@ function SearchController($scope, $location, $http, $timeout) {
 
   var emptySelect = {
     onUpdate: function(q) {
-      var path = 'search/'+$scope.docsets.join('+')+'/';
+      var path = 'search/'+$scope.docsets.join(',')+'/';
       $location.path(path);
       ++requestCounter;
       $scope.results = [];
@@ -84,7 +84,7 @@ function SearchController($scope, $location, $http, $timeout) {
 
   var articleSelect = {
     onUpdate: function(q) {
-      var path = 'search/'+$scope.docsets.join('+')+'/';
+      var path = 'search/'+$scope.docsets.join(',')+'/';
       $location.path(path+q);
       pending = $timeout(function() {
         $scope.doSearch(q);
