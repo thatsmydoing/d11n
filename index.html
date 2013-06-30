@@ -10,7 +10,7 @@
       <a ng-bind="">Loading...</a>
       <a class="ng-cloak" ng-click="query = '!'">{{currentDocset}} <span>{{ parts() }}</span></a>
     </h3>
-    <div id="indicator">d<span ng-class="{searching: searching}">11</span>n</div>
+    <a id="indicator" href="splash.html" target="frame">d<span ng-class="{searching: searching}">11</span>n</a>
     <input type="text" id="search" class="search" ng-model="query" placeholder="Search..." autofocus="autofocus" autocomplete="off">
     <span class="ng-cloak" id="parents" ng-show="parents() != ''"><input type="checkbox" ng-model="withParent"> include {{ parents() }}?</span>
     <ul id="results" class="search-results ng-cloak">
