@@ -115,6 +115,7 @@ function SearchController($scope, $location, $http, $timeout) {
 
   $scope.onItemClick = function(index) {
     if(index < 0) index = 0;
+    if(index >= $scope.results.length) return;
     if($scope.isSearch()) {
       frame.src = $scope.results[index].path;
     }
