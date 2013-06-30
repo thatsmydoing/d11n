@@ -71,7 +71,24 @@ function SearchController($scope, $location, $http, $timeout, docsetResolver) {
   $scope.query = "";
   $scope.withParent = false;
 
+  function watchSet(field) {
+    $scope.$watch(field, function(v) {
+      localStorage.setItem(field, v);
+    });
+  }
+
+  function loadFromStorage() {
+    if(localStorage.getItem('currentDocset') == null) {
+      $scope.query = '!';
+    }
+    else {
+      $scope.currentDocset = localStorage.getItem('currentDocset');
+      $scope.withParent = localStorage.getItem('withParent');
+    }
+  }
+
   function loadFromLocation() {
+    if($scope.availableDocsets.length == 0) return false;
     var paths = $location.path().substring(8).split('/');
     if(paths.length == 2) {
       $scope.withParent = false;
@@ -81,9 +98,11 @@ function SearchController($scope, $location, $http, $timeout, docsetResolver) {
       }
       $scope.currentDocset = paths[0];
       $scope.query = paths[1];
+      return true;
     }
+    return false;
   }
-  loadFromLocation();
+
   $scope.$on('$locationChangeSuccess', loadFromLocation);
 
   var pending = null;
@@ -167,10 +186,6 @@ function SearchController($scope, $location, $http, $timeout, docsetResolver) {
     $scope.resetSelection();
   }
 
-  $scope.$watch('query', onUpdate);
-  $scope.$watch('currentDocset', onUpdate);
-  $scope.$watch('withParent', onUpdate);
-
   function unescape(input){
     var e = document.createElement('div');
     e.innerHTML = input;
@@ -252,6 +267,16 @@ function SearchController($scope, $location, $http, $timeout, docsetResolver) {
       data.push(key);
     })
     $scope.availableDocsets = data.sort(caseInsensitiveCmp);
+
+    if(!loadFromLocation()) {
+      loadFromStorage();
+    }
+
+    $scope.$watch('query', onUpdate);
+    $scope.$watch('currentDocset', onUpdate);
+    $scope.$watch('withParent', onUpdate);
+    watchSet('currentDocset');
+    watchSet('withParent');
   });
 
   $scope.parts = function() {
