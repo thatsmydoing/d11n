@@ -31,10 +31,11 @@ html, body, div {
 }
 
 iframe {
-    /* seamless doesn't work for FF yet */
-    height: 98%;
+    height: 100%;
     width: 100%;
     border: none;
+    box-sizing: border-box;
+    -moz-box-sizing: border-box;
 }
 
 .search {
