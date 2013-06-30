@@ -5,7 +5,7 @@
   <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
-  <div id="sidebar" ng-controller="SearchController" ng-mouseout="selected = -1">
+  <div id="sidebar" ng-controller="SearchController" ng-mouseout="resetSelection()">
     <h3 id="currentDocset"><a ng-click="query = '!'">{{docsets[0]}}</a></h3>
     <div id="indicator">d<span ng-class="{searching: searching}">11</span>n</div>
     <input type="text" id="search" class="search" ng-model="query" placeholder="Search..." autofocus="autofocus" autocomplete="off">
@@ -17,7 +17,7 @@
         </a>
       </li>
     </ul>
-    <p ng-show="!searching && isSearch() && results.length == 0">No results.</p>
+    <p ng-show="noResults()">No results.</p>
   </div>
   <div id="content">
     <iframe id="frame" name="frame" seamless src="splash.html"></iframe>

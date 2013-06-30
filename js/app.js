@@ -52,8 +52,8 @@ function SearchController($scope, $location, $http, $timeout) {
   var requestCounter = 0;
   $scope.searching = false;
 
-  $scope.isSearch = function() {
-    return currentMode == languageSelect;
+  $scope.noResults = function() {
+    return !$scope.searching && currentMode == articleSelect && $scope.results.length == 0;
   }
 
   var emptySelect = {
@@ -121,7 +121,7 @@ function SearchController($scope, $location, $http, $timeout) {
       switchMode(articleSelect);
     }
     currentMode.onUpdate(q);
-    $scope.selected = -1;
+    $scope.resetSelection();
   }
 
   $scope.$watch('query', onUpdate);
@@ -146,7 +146,9 @@ function SearchController($scope, $location, $http, $timeout) {
     });
   };
 
-  $scope.selected = -1;
+  $scope.resetSelection = function() {
+    $scope.selected = -1;
+  }
 
   $scope.onItemHover = function(index) {
     $scope.selected = index;
@@ -156,7 +158,7 @@ function SearchController($scope, $location, $http, $timeout) {
     if(index < 0) index = 0;
     if(index >= $scope.results.length) return;
     currentMode.onItemClick(index);
-    $scope.selected = -1;
+    $scope.resetSelection();
   };
 
   function updateScroll() {
@@ -189,7 +191,7 @@ function SearchController($scope, $location, $http, $timeout) {
       $scope.onItemClick($scope.selected);
     }
     else if(event.keyCode == 27) {
-      $scope.selected = -1;
+      $scope.resetSelection();
     }
     $scope.$apply();
   });
