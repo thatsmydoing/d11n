@@ -234,12 +234,12 @@ function SearchController($scope, $location, $http, $timeout, docsetResolver) {
   }
 
   angular.element(search).bind('keydown', function(event) {
-    if(event.keyCode == 40) {
+    if((event.keyCode == 40) || (event.ctrlKey && event.keyCode == 74)) {
       $scope.selected = ($scope.selected + 1) % $scope.results.length;
       updateScroll();
       event.preventDefault();
     }
-    else if(event.keyCode == 38) {
+    else if((event.keyCode == 38) || (event.ctrlKey && event.keyCode == 75)) {
       $scope.selected -= 1;
       if($scope.selected < 0) $scope.selected = $scope.results.length - 1;
       updateScroll();
